@@ -8,10 +8,16 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
+import { SiteSettingsProvider } from "@/context/site-settings";
+import { Analytics } from "@/components/analytics";
+import { SmoothScroll } from "@/components/smooth-scroll";
+import { loadSiteSettings } from "@/lib/public-content";
+import { jsonLd, siteUrl } from "@/lib/seo";
+import { instagramUrl } from "@/lib/social-links";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -38,9 +44,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -74,13 +77,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: () => loadSiteSettings(),
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "DLFLY Overseas" },
       { name: "twitter:card", content: "summary_large_image" },
+      ...(loaderData?.searchConsoleVerification
+        ? [{ name: "google-site-verification", content: loaderData.searchConsoleVerification }]
+        : []),
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -93,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/images/dlfly-logo.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -118,11 +125,32 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const settings = Route.useLoaderData();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteSettingsProvider initial={settings}>
+        <MotionConfig reducedMotion="user">
+          <SmoothScroll />
+          <Analytics />
+          <Outlet />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: jsonLd({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "DLFLY Overseas",
+                url: siteUrl,
+                telephone: "+91 6304636998",
+                email: "dlflyoverseas@gmail.com",
+                sameAs: [instagramUrl],
+                ...(settings.logoUrl ? { logo: settings.logoUrl } : {}),
+              }),
+            }}
+          />
+        </MotionConfig>
+      </SiteSettingsProvider>
     </QueryClientProvider>
   );
 }

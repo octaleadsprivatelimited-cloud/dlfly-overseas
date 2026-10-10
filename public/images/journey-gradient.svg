@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <radialGradient id="violet-glow">
+      <stop stop-color="#8b82e8" stop-opacity=".52"/>
+      <stop offset="1" stop-color="#8b82e8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blue-glow">
+      <stop stop-color="#56b6c9" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#56b6c9" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ribbon" x1="720" y1="80" x2="1470" y2="810" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#cad6f6" stop-opacity=".6"/>
+      <stop offset=".28" stop-color="#8785d9" stop-opacity=".65"/>
+      <stop offset=".58" stop-color="#667cbd" stop-opacity=".25"/>
+      <stop offset=".82" stop-color="#69c2d5" stop-opacity=".65"/>
+      <stop offset="1" stop-color="#afdfe4" stop-opacity=".35"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="1320" y1="200" x2="1130" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d3dcff" stop-opacity=".55"/>
+      <stop offset=".4" stop-color="#7783c7" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#3e90b2" stop-opacity=".5"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="880" y1="0" x2="1310" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e0d3ff" stop-opacity=".6"/>
+      <stop offset=".5" stop-color="#adbbe8" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#93d5e0" stop-opacity=".5"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="1240" cy="130" rx="620" ry="490" fill="url(#violet-glow)"/>
+  <ellipse cx="1500" cy="770" rx="660" ry="500" fill="url(#blue-glow)"/>
+  <path d="M710-130C1010-30 1430 50 1390 330C1350 610 960 610 1110 970L1410 1000C1230 640 1730 620 1680 300C1640 10 1180-100 940-220Z" fill="url(#ribbon)"/>
+  <path d="M1390 330C1350 610 960 610 1110 970L1250 980C1100 650 1570 600 1510 310C1500 230 1460 150 1370 80C1395 165 1402 252 1390 330Z" fill="url(#fold)"/>
+  <path d="M710-130C1010-30 1430 50 1390 330C1350 610 960 610 1110 970" stroke="url(#edge)" stroke-width="2"/>
+  <path d="M940-220C1180-100 1640 10 1680 300C1730 620 1230 640 1410 1000" stroke="url(#edge)" stroke-width="2"/>
+  <g stroke="#b8d1e6" stroke-opacity=".16">
+    <ellipse cx="1310" cy="420" rx="460" ry="260" transform="rotate(-32 1310 420)"/>
+    <ellipse cx="1310" cy="420" rx="580" ry="360" transform="rotate(-32 1310 420)"/>
+    <path d="M850 805C1140 750 1350 160 1620 70" stroke-dasharray="5 12"/>
+  </g>
+  <g fill="#e4c98c">
+    <circle cx="1014" cy="112" r="5"/>
+    <circle cx="1540" cy="460" r="6"/>
+    <circle cx="1012" cy="714" r="4"/>
+  </g>
+  <g stroke="#e4c98c" stroke-opacity=".26">
+    <circle cx="1014" cy="112" r="14"/>
+    <circle cx="1540" cy="460" r="17"/>
+    <circle cx="1012" cy="714" r="12"/>
+  </g>
+</svg>

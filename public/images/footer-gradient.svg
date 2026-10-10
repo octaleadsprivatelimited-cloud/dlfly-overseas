@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 400" fill="none">
+  <defs>
+    <linearGradient id="arch" x1="1100" y1="30" x2="1550" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ddd1f2"/>
+      <stop offset=".35" stop-color="#ac9fdc"/>
+      <stop offset=".7" stop-color="#6e8bce"/>
+      <stop offset="1" stop-color="#adc5ec"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="1270" y1="80" x2="1440" y2="260" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e3dbf5"/>
+      <stop offset=".5" stop-color="#7086c6"/>
+      <stop offset="1" stop-color="#b8c9ef"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="1060" y1="-30" x2="1600" y2="380" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e6def6"/>
+      <stop offset="1" stop-color="#5679bb"/>
+    </linearGradient>
+    <radialGradient id="orb">
+      <stop stop-color="#f9ebbd"/>
+      <stop offset="1" stop-color="#dcbf79"/>
+    </radialGradient>
+  </defs>
+  <path d="M1020-70C1150-10 1285 5 1280 125C1275 240 1100 280 1160 450L1350 465C1250 270 1475 285 1490 135C1505-25 1290-60 1140-135Z" fill="url(#arch)"/>
+  <path d="M1280 125C1275 240 1100 280 1160 450L1265 460C1170 290 1370 280 1370 145C1370 82 1322 35 1255 5C1275 43 1283 84 1280 125Z" fill="url(#fold)"/>
+  <path d="M1020-70C1150-10 1285 5 1280 125C1275 240 1100 280 1160 450" stroke="#f3eefb" stroke-width="2"/>
+  <path d="M1480-50L1650 5L1560 160L1410 98Z" fill="url(#fold)"/>
+  <path d="M1410 98L1560 160L1580 175L1430 120Z" fill="#657eb9"/>
+  <path d="M1470 325L1575 255L1675 370L1565 435Z" fill="url(#edge)"/>
+  <circle cx="1110" cy="52" r="20" fill="url(#orb)"/>
+  <circle cx="1500" cy="224" r="12" fill="url(#orb)"/>
+  <path d="M850 375C1070 250 1260 370 1550 60" stroke="#819bcc" stroke-opacity=".35"/>
+  <path d="M895 400C1130 280 1320 380 1600 100" stroke="#819bcc" stroke-opacity=".2"/>
+</svg>

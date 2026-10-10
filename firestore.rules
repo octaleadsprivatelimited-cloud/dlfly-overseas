@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'dlflyoverseas@gmail.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function text(data, key, minimum, maximum) {
+      return data[key] is string && data[key].size() >= minimum && data[key].size() <= maximum;
+    }
+    function image(value) {
+      return value is string && value.size() <= 2000 && value.matches('^(https://[^ ]+|/images/[a-zA-Z0-9._-]+)$');
+    }
+    function timestamps(data) {
+      return data.createdAt is timestamp && data.updatedAt is timestamp;
+    }
+    function article(data, id) {
+      return data.keys().hasOnly(['title', 'slug', 'excerpt', 'body', 'category', 'coverUrl', 'published', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['title', 'slug', 'excerpt', 'body', 'category', 'coverUrl', 'published', 'createdAt', 'updatedAt'])
+        && text(data, 'title', 5, 180) && text(data, 'slug', 3, 100)
+        && data.slug == id && data.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && text(data, 'excerpt', 20, 400) && text(data, 'body', 80, 50000)
+        && data.category in ['Study abroad', 'Visa guidance', 'Permanent residency', 'Education loans', 'Company news']
+        && image(data.coverUrl) && data.published is bool && timestamps(data);
+    }
+    function gallery(data) {
+      return data.keys().hasOnly(['title', 'imageUrl', 'alt', 'caption', 'published', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['title', 'imageUrl', 'alt', 'caption', 'published', 'createdAt', 'updatedAt'])
+        && text(data, 'title', 3, 180) && image(data.imageUrl) && text(data, 'alt', 5, 300)
+        && text(data, 'caption', 0, 500) && data.published is bool && timestamps(data);
+    }
+    function video(data) {
+      return data.keys().hasOnly(['title', 'youtubeUrl', 'description', 'published', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['title', 'youtubeUrl', 'description', 'published', 'createdAt', 'updatedAt'])
+        && text(data, 'title', 3, 180) && text(data, 'youtubeUrl', 11, 2000)
+        && data.youtubeUrl.matches('^(https://((www|m)\\.)?(youtube\\.com|youtube-nocookie\\.com|youtu\\.be)/[^ ]+|[a-zA-Z0-9_-]{11})$')
+        && text(data, 'description', 0, 1000) && data.published is bool && timestamps(data);
+    }
+    function enquiry(data) {
+      return data.keys().hasOnly(['name', 'email', 'phone', 'service', 'country', 'message', 'consent', 'sourcePath', 'status', 'notes', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['name', 'email', 'phone', 'service', 'country', 'message', 'consent', 'sourcePath', 'status', 'notes', 'createdAt', 'updatedAt'])
+        && text(data, 'name', 2, 100) && data.name.matches('^\\S[\\s\\S]*\\S$')
+        && text(data, 'email', 3, 254) && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        && text(data, 'phone', 7, 30) && data.phone.matches('^[+() .-]*([0-9][() .-]*){7,15}$')
+        && data['service'] in ['Study abroad', 'Visa guidance', 'Visit visa', 'Dependent visa', 'Permanent residency', 'Education finance', 'General enquiry']
+        && data.country in ['United Kingdom', 'United States', 'Canada', 'Australia', 'New Zealand', 'Slovakia', 'Ireland', 'Germany', 'France', 'Italy', 'Netherlands', 'Austria', 'Switzerland', 'Malta', 'Not decided', 'Other']
+        && text(data, 'message', 10, 2000) && data.message.matches('^\\S[\\s\\S]*\\S$')
+        && data.consent == true
+        && data.sourcePath in ['/', '/contact', '/study-abroad', '/visa', '/visit-visa', '/dependent-visa', '/permanent-residency', '/education-loans']
+        && data.status in ['new', 'contacted', 'closed']
+        && text(data, 'notes', 0, 2000) && timestamps(data);
+    }
+    match /articles/{id} {
+      allow get: if isAdmin() || resource.data.published == true;
+      allow list: if isAdmin() || (resource.data.published == true && request.query.limit <= 100);
+      allow create, update: if isAdmin() && article(request.resource.data, id);
+      allow delete: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow get: if isAdmin() || resource.data.published == true;
+      allow list: if isAdmin() || (resource.data.published == true && request.query.limit <= 100);
+      allow create, update: if isAdmin() && gallery(request.resource.data);
+      allow delete: if isAdmin();
+    }
+    match /videos/{id} {
+      allow get: if isAdmin() || resource.data.published == true;
+      allow list: if isAdmin() || (resource.data.published == true && request.query.limit <= 100);
+      allow create, update: if isAdmin() && video(request.resource.data);
+      allow delete: if isAdmin();
+    }
+    match /enquiries/{id} {
+      allow create: if enquiry(request.resource.data)
+        && request.resource.data.status == 'new'
+        && request.resource.data.notes == ''
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin() && enquiry(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /settings/site {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['logoUrl', 'address', 'mapsEmbedUrl', 'ga4Id', 'clarityId', 'searchConsoleVerification', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['logoUrl', 'address', 'mapsEmbedUrl', 'ga4Id', 'clarityId', 'searchConsoleVerification'])
+        && text(request.resource.data, 'logoUrl', 0, 2000)
+        && (request.resource.data.logoUrl == '' || image(request.resource.data.logoUrl))
+        && text(request.resource.data, 'address', 0, 500)
+        && text(request.resource.data, 'mapsEmbedUrl', 0, 3000)
+        && (request.resource.data.mapsEmbedUrl == '' || request.resource.data.mapsEmbedUrl.matches('^https://(www\\.google\\.com|maps\\.google\\.com)/maps[^ ]*$'))
+        && text(request.resource.data, 'ga4Id', 0, 100) && request.resource.data.ga4Id.matches('^(G-[A-Z0-9]+)?$')
+        && text(request.resource.data, 'clarityId', 0, 100) && request.resource.data.clarityId.matches('^[a-zA-Z0-9]*$')
+        && text(request.resource.data, 'searchConsoleVerification', 0, 300) && request.resource.data.searchConsoleVerification.matches('^[a-zA-Z0-9_-]*$');
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
